@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuS: Quiet Hours</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alice&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="journal-layout">
+    <section class="timer-box" aria-labelledby="app-name">
+        <div class="card-topbar">
+            <p id="tagline" class="app-tagline">An instrument for keeping the rhythm of attention.</p>
+            <div class="language-toggle" aria-label="Language switcher">
+                <button type="button" id="lang-en" class="lang-link is-active">EN</button>
+                <span class="lang-divider">|</span>
+                <button type="button" id="lang-id" class="lang-link">ID</button>
+            </div>
+        </div>
+        <h1 id="app-name">Quiet Hours</h1>
+        <p id="supporting-line" class="supporting-line">Finish a session to unlock a species, a biology fact, and a reflective quote.</p>
+
+        <div class="time-settings">
+            <label for="time-options" id="time-options-label">Choose a duration:</label>
+            <select id="time-options"></select>
+        </div>
+
+        <h2 id="time-display">25:00</h2>
+
+        <div class="controls">
+            <button id="start-btn" class="btn-primary">Enter quiet</button>
+            <button id="pause-btn" class="btn-secondary hidden">Hold this moment</button>
+        </div>
+        <p id="controls-microcopy" class="controls-microcopy">Choose a duration and see what the archive reveals when time runs out.</p>
+    </section>
+
+    <section class="garden-box" aria-labelledby="garden-title">
+        <p id="welcome-back" class="garden-kicker">Welcome back to the archive.</p>
+        <h3 id="garden-title">Quiet Archive</h3>
+
+        <div class="garden-stats">
+            <span><span id="sessions-label">Entries Logged</span>: <b id="session-count">0</b></span>
+            <span><span id="species-label">Archive Types</span>: <b id="species-count">0</b></span>
+        </div>
+
+        <div id="garden-area">
+            <div class="archive-intro">
+                <p id="archive-intro-text">Recent time settles here as a short trace.</p>
+            </div>
+
+            <div class="archive-grid">
+                <article id="latest-discovery" class="latest-discovery hidden">
+                    <div class="archive-card-topline">
+                        <span id="latest-discovery-label">Latest Entry</span>
+                        <span id="latest-rarity" class="badge common">MINOR</span>
+                    </div>
+                    <div class="archive-entry-head">
+                        <span id="latest-emoji" class="archive-entry-mark" aria-hidden="true">🐝</span>
+                        <div class="archive-entry-names">
+                            <b id="latest-name">Phalaenopsis amabilis</b>
+                            <span id="latest-common-name">Moon Orchid</span>
+                        </div>
+                    </div>
+                    <p id="latest-note" class="archive-entry-note"></p>
+                    <p id="latest-quote" class="archive-entry-quote hidden"></p>
+                </article>
+
+                <p id="empty-garden-msg">No entries have been noted yet. Let a little time pass, and the archive will begin to speak.</p>
+
+                <section class="archive-list-block">
+                    <div class="archive-list-heading">
+                        <span id="archive-list-title">Recent Traces</span>
+                        <span id="archive-list-hint">Last three entries</span>
+                    </div>
+                    <div id="archive-list" class="archive-list"></div>
+                </section>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <h2></h2>
+            <p></p>
+            <button id="close-popup">Keep this entry</button>
+        </div>
+    </div>
+
+    <script src="speciesDatabase.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
