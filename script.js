@@ -56,11 +56,16 @@ let timerInterval = null;
 let timeLeft = 0;
 let isRunning = false;
 let hasStarted = false;
+let timerEndsAt = null;
 let sessionCount = 0;
 let speciesCount = 0;
 let currentReward = null;
 let gardenCollection = [];
 let selectedArchiveEntryNumber = null;
+
+function notificationsSupported() {
+    return "Notification" in window;
+}
 
 function t(key) {
     return translations[currentLanguage]?.[key] || translations.en[key] || key;
@@ -130,9 +135,32 @@ function renderTimeOptions() {
     });
 }
 
+function getSavedTimerState() {
+    const savedData = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!savedData) return null;
+
+    try {
+        const parsedData = JSON.parse(savedData);
+        return parsedData?.timerState || null;
+    } catch {
+        return null;
+    }
+}
+
 function getSelectedTimeInSeconds() {
     const selectedOption = getSelectedTimeConfig();
     return selectedOption.unit === "seconds" ? selectedOption.value : selectedOption.value * 60;
+}
+
+function setSelectedTimeConfig(config = DEFAULT_TIME) {
+    const { value, unit } = config;
+    const matchingOption = Array.from(timeOptions.options).find((option) => (
+        parseInt(option.value, 10) === value && (option.dataset.unit || "minutes") === unit
+    ));
+
+    if (matchingOption) {
+        matchingOption.selected = true;
+    }
 }
 
 function syncLanguageToggle() {
@@ -315,15 +343,70 @@ function saveData() {
     const latestDiscovery = gardenCollection.length > 0
         ? gardenCollection[gardenCollection.length - 1]
         : null;
+    const selectedTime = getSelectedTimeConfig();
 
     const dataPacket = {
         sessionCount,
         speciesCount,
         gardenCollection,
-        latestDiscovery
+        latestDiscovery,
+        timerState: {
+            selectedTime,
+            timeLeft,
+            hasStarted,
+            isRunning,
+            timerEndsAt
+        }
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataPacket));
+}
+
+function requestNotificationPermissionIfNeeded() {
+    if (!notificationsSupported()) return;
+    if (Notification.permission !== "default") return;
+
+    Notification.requestPermission().catch(() => {
+        // Ignore permission request failures and keep the in-app popup as fallback.
+    });
+}
+
+function showRewardNotification(reward) {
+    if (!notificationsSupported()) return;
+    if (Notification.permission !== "granted") return;
+
+    const rewardName = getSpeciesName(reward);
+    const bodyLines = [
+        `${t("rewardNotificationBody")} ${reward.scientificName}`,
+        rewardName !== reward.scientificName ? rewardName : "",
+        getSpeciesFact(reward)
+    ].filter(Boolean);
+
+    const notification = new Notification(t("rewardNotificationTitle"), {
+        body: bodyLines.join("\n"),
+        icon: "favicon.png",
+        badge: "favicon.png",
+        tag: "quiet-hours-reward"
+    });
+
+    notification.onclick = () => {
+        window.focus();
+        notification.close();
+    };
+}
+
+function completeSession() {
+    isRunning = false;
+
+    const reward = pullGacha();
+    currentReward = reward;
+
+    popupTitleUI.textContent = t("sessionComplete");
+    popupTextUI.innerHTML = getRewardMarkup(reward);
+
+    showRewardNotification(reward);
+    popup.classList.remove("hidden");
+    resetTimer();
 }
 
 function loadData() {
@@ -336,6 +419,35 @@ function loadData() {
 
     const uniqueSpecies = new Set(gardenCollection.map((species) => species.id));
     speciesCount = uniqueSpecies.size;
+
+    const savedTimerState = parsedData.timerState;
+    if (savedTimerState?.selectedTime) {
+        setSelectedTimeConfig(savedTimerState.selectedTime);
+    }
+
+    if (savedTimerState?.hasStarted) {
+        hasStarted = true;
+
+        if (savedTimerState.isRunning && savedTimerState.timerEndsAt) {
+            timerEndsAt = savedTimerState.timerEndsAt;
+            timeLeft = Math.max(0, Math.ceil((timerEndsAt - Date.now()) / 1000));
+
+            if (timeLeft <= 0) {
+                completeSession();
+            } else {
+                isRunning = true;
+                timeOptions.disabled = true;
+                startInterval();
+            }
+        } else {
+            isRunning = false;
+            timerEndsAt = null;
+            timeLeft = savedTimerState.timeLeft || getSelectedTimeInSeconds();
+            timeOptions.disabled = true;
+        }
+    } else {
+        timeLeft = getSelectedTimeInSeconds();
+    }
 
     sessionCountUI.textContent = sessionCount;
     speciesCountUI.textContent = speciesCount;
@@ -424,23 +536,19 @@ export function setLanguage(lang) {
 window.setLanguage = setLanguage;
 
 function startInterval() {
+    clearInterval(timerInterval);
+
     timerInterval = setInterval(() => {
-        timeLeft--;
+        if (!timerEndsAt) return;
+
+        timeLeft = Math.max(0, Math.ceil((timerEndsAt - Date.now()) / 1000));
         updateDisplay();
+        saveData();
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
-            isRunning = false;
-
-            const reward = pullGacha();
-            currentReward = reward;
-
-            popupTitleUI.textContent = t("sessionComplete");
-            popupTextUI.innerHTML = getRewardMarkup(reward);
-
-            popup.classList.remove("hidden");
-            resetTimer();
+            completeSession();
         }
     }, 1000);
 }
@@ -448,11 +556,17 @@ function startInterval() {
 function startTimer() {
     if (isRunning) return;
 
+    requestNotificationPermissionIfNeeded();
+
     hasStarted = true;
     isRunning = true;
+    timeLeft = getSelectedTimeInSeconds();
+    timerEndsAt = Date.now() + (timeLeft * 1000);
     timeOptions.disabled = true;
 
     updateButtons();
+    updateDisplay();
+    saveData();
     startInterval();
 }
 
@@ -461,7 +575,11 @@ function pauseTimer() {
 
     clearInterval(timerInterval);
     timerInterval = null;
+    timeLeft = Math.max(0, Math.ceil((timerEndsAt - Date.now()) / 1000));
+    timerEndsAt = null;
     isRunning = false;
+    saveData();
+    updateDisplay();
     updateButtons();
 }
 
@@ -469,7 +587,9 @@ function resumeTimer() {
     if (!hasStarted || isRunning) return;
 
     isRunning = true;
+    timerEndsAt = Date.now() + (timeLeft * 1000);
     updateButtons();
+    saveData();
     startInterval();
 }
 
@@ -479,11 +599,13 @@ function resetTimer() {
 
     isRunning = false;
     hasStarted = false;
+    timerEndsAt = null;
     timeLeft = getSelectedTimeInSeconds();
     timeOptions.disabled = false;
 
     updateDisplay();
     updateButtons();
+    saveData();
 }
 
 function pullGacha() {
@@ -541,6 +663,7 @@ timeOptions.addEventListener("change", () => {
 
     timeLeft = getSelectedTimeInSeconds();
     updateDisplay();
+    saveData();
 });
 
 closePopupBtn.addEventListener("click", () => {
@@ -556,7 +679,15 @@ langEnBtn.addEventListener("click", () => setLanguage("en"));
 langIdBtn.addEventListener("click", () => setLanguage("id"));
 
 renderTimeOptions();
-timeLeft = getSelectedTimeInSeconds();
+const initialTimerState = getSavedTimerState();
+setSelectedTimeConfig(initialTimerState?.selectedTime || DEFAULT_TIME);
+timeLeft = initialTimerState?.hasStarted
+    ? (
+        initialTimerState.isRunning && initialTimerState.timerEndsAt
+            ? Math.max(0, Math.ceil((initialTimerState.timerEndsAt - Date.now()) / 1000))
+            : (initialTimerState.timeLeft || getSelectedTimeInSeconds())
+    )
+    : getSelectedTimeInSeconds();
 updateDisplay();
 loadData();
 renderUI();
