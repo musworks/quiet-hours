@@ -765,5 +765,55 @@ button:focus-visible,
 
     .popup-content {
         padding: 28px 22px;
+    
     }
+}
+    footer {
+    display: flex; /* Gunakan flexbox untuk penengahan yang lebih kuat */
+    flex-direction: column; /* Pastikan gambar di atas teks */
+    align-items: center; /* Menengahkan semua konten secara horizontal */
+    justify-content: center; /* Menengahkan semua konten secara vertikal jika ada tinggi lebih */
+    text-align: center; /* Untuk memastikan teks di dalam paragraf berpusat */
+    
+    /* Gaya visual ala PaperMod (pertahankan) */
+    border-top: 1px solid #e5e0dc; /* Warna krem hangat/sage pudar */
+    margin-top: 4rem;
+    padding-top: 2rem;
+    color: #6b625b; /* Warna teks hangat */
+    font-size: 0.7rem;
+}
+
+footer p {
+    margin: 0;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* Styling khusus untuk efek garis bawah pada link (pertahankan) */
+footer a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #9c8e8c; /* Garis bawah warna muted orchid */
+    padding-bottom: 2px;
+    transition: border-bottom-color 0.3s ease;
+}
+
+footer a:hover {
+    border-bottom-color: #4a423e; /* Warnanya sedikit menggelap saat di-hover */
+}
+
+/* Update: Ukuran signature yang jauh lebih kecil */
+.mus-signature {
+    width: 25px; /* Ukuran diperkecil secara signifikan */
+    height: auto; /* Mempertahankan rasio */
+    max-width: 100%; /* Agar tidak meluap di container kecil */
+    opacity: 0.8;
+    margin-bottom: 0.5rem; /* Jarak antara gambar dan teks */
+    transition: all 0.3s ease; 
+}
+
+/* Hover effect for signature (pertahankan) */
+.mus-signature:hover {
+    opacity: 1;
+    transform: scale(1.05);
 }
