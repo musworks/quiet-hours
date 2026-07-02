@@ -80,12 +80,12 @@ const speciesDatabase = [
         rarity: "rare",
         image: "assets/Phalaenopsisamabilis.png",
         fact: {
-            en: "Phalaenopsis amabilis is officially designated as Indonesia's 'flower of charm' (puspa pesona). This means it's not just beautiful, but a true symbol of the elegance of the archipelago's flora.",
-            id: "Phalaenopsis amabilis ditetapkan sebagai salah satu puspa pesona Indonesia. Artinya, dia bukan sekadar cantik, tapi juga simbol keanggunan flora Nusantara."
+            en: "Phalaenopsis amabilis is one of Indonesians national flowers, known as puspa pesona. In the wild, it grows as an epiphyte in humid tropical forests, often resting on tree branches where light and air can reach its roots.",
+            id: "Phalaenopsis amabilis adalah salah satu bunga nasional Indonesia, dikenal sebagai puspa pesona. Di alam liar, anggrek ini hidup sebagai epifit di hutan tropis lembap, sering menempel pada cabang pohon agar akar-akarnya mendapat cahaya dan aliran udara."
         },
         unlockQuote: {
-            en: "After the flowers fall, the stem can sometimes produce new branches and bloom again. So, even when it seems finished... it's actually just preparing for its next chapter.",
-            id: "Setelah bunga gugur, tangkainya kadang bisa menghasilkan cabang baru dan berbunga lagi. Jadi, meskipun terlihat selesai… sebenarnya dia hanya sedang menyiapkan bab berikutnya."
+            en: "It does not need to own the tree to belong there. Some forms of life survive by finding the right place to hold on.",
+            id: "Ia tidak perlu memiliki pohon untuk menjadi bagian dari sana. Beberapa kehidupan bertahan dengan menemukan tempat yang tepat untuk berpaut."
         },
         tags: ["flower", "orchid"],
         habitat: "tree_branch",
@@ -105,12 +105,12 @@ const speciesDatabase = [
         rarity: "rare",
         image: "assets/Danausplexippus.png",
         fact: {
-            en: "These butterflies migrate thousands of kilometers from North America to Mexico. Interestingly, this journey isn't completed by a single individual, but spans across multiple generations. Imagine... one generation 'starts', the next 'continues', and the final one reaches the destination. It's like a relay race of life.",
-            id: "Kupu-kupu ini melakukan migrasi ribuan kilometer dari Amerika Utara ke Meksiko. Yang menarik, perjalanan itu tidak diselesaikan oleh satu individu saja, tapi lintas generasi. Bayangkan… satu generasi “memulai”, generasi berikutnya “melanjutkan”, dan yang terakhir tiba di tujuan. Seperti estafet kehidupan."
+            en: "Monarch butterflies are known for their long migration across North America. Some travel more than 3,000 km to overwinter in Mexico, while the full northward cycle unfolds across several generations.",
+            id: "Kupu-kupu monarch dikenal karena migrasi jauhnya melintasi Amerika Utara. Sebagian menempuh lebih dari 3.000 km untuk melewati musim dingin di Meksiko, sementara siklus perjalanan ke utara berlangsung lintas beberapa generasi."
         },
         unlockQuote: {
-            en: "Their population is declining due to habitat loss, pesticide use, and climate change. It's ironic, isn't it? A creature so resilient is ultimately vulnerable to the changes we create.",
-            id: "Populasinya menurun karena hilangnya habitat, penggunaan pestisida, dan perubahan iklim. Ironis ya, makhluk yang begitu tangguh justru rentan oleh perubahan yang kita ciptakan.."
+            en: "A journey this long is never carried by wings alone. It depends on host plants, resting places, forests, weather, and the fragile continuity between one generation and the next.",
+            id: "Perjalanan sejauh ini tidak pernah ditopang oleh sayap saja. Ia bergantung pada tanaman inang, tempat singgah, hutan, cuaca, dan kesinambungan rapuh dari satu generasi ke generasi berikutnya."
         },
         tags: ["pollinator", "butterfly", "flying"],
         habitat: "air",
@@ -130,12 +130,12 @@ const speciesDatabase = [
         rarity: "common",
         image: "assets/Zinniaelegans.png",
         fact: {
-            en: "What we perceive as a single flower is actually a cluster of many tiny flowers (florets). The center is made of disk flowers, and the outer 'petals' are ray flowers. Conceptually, it's like having multiple versions of the self appearing as one unified identity.",
-            id: "Yang kita lihat sebagai satu bunga sebenarnya adalah kumpulan banyak bunga kecil (floret). Bagian tengah itu bunga tabung, dan “kelopak” di luar adalah bunga pita. Secara konsep, ini seperti beberapa versi diri yang keliatan sebagai satu identitas."
+            en: "A zinnia bloom is a flower head made of many small florets. The outer florets form the petal-like ring, while the center holds a dense cluster of disk florets.",
+            id: "Satu kuntum bunga zinnia sebenarnya adalah kumpulan dari banyak bunga kecil. Bagian luar membentuk lingkaran kelopak, sementara bagian tengahnya dipadati oleh deretan bunga cakram."
         },
         unlockQuote: {
-            en: "Picking the flowers actually stimulates the growth of new blooms. It's a bit of a paradox, isn't it... 'loss' actually encourages productivity. Bright petals bloom, making the garden feel more alive.",
-            id: "Memetik bunga justru merangsang pertumbuhan bunga baru. Sedikit paradoks ya… “kehilangan” malah mendorong produktivitas. Kelopak cerah bermekaran dan membuat kebun terasa lebih ramai."
+            en: "Removing spent blooms helps the plant keep flowering. Zinnia stays lively through repetition: bloom, fade, return.",
+            id: "Memangkas bunga yang layu akan merangsang tanaman untuk terus berbunga. Zinnia merayakan kehidupan lewat siklus yang berulang: mekar, gugur, dan tumbuh kembali."
         },
         tags: ["flower", "botany", "starter"],
         habitat: "flower_bed",
@@ -152,12 +152,12 @@ const speciesDatabase = [
         rarity: "common",
         image: "assets/Portulacagrandiflora.png",
         fact: {
-            en: "It tolerates heat, survives droughts, and can even thrive in nutrient-poor soil. The secret lies in its succulent nature—its leaves store water like tiny bottles it carries everywhere.",
-            id: "Dia tahan panas, tahan kering, bahkan tanah miskin nutrisi pun masih bisa ditinggali. Kuncinya ada pada sifat sukulen, daunnya menyimpan air seperti botol kecil yang selalu dibawa ke mana-mana."
+            en: "Portulaca grandiflora is a sun-loving succulent that tolerates heat, drought, and lean soil as long as the ground drains well. Its fleshy leaves store water, helping it stay lively in dry, bright places.",
+            id: "Portulaca grandiflora adalah sukulen penyuka matahari yang tahan panas, kekeringan, dan tanah gersang selama drainasenya baik. Daunnya yang berdaging menyimpan air, membantu tanaman ini tetap segar di tempat yang terang dan kering."
         },
         unlockQuote: {
-            en: "Each flower might only last a single day, but this plant continuously produces new blooms. It is not about the duration of a single moment, but the continuity.",
-            id: "Setiap bunga mungkin hanya bertahan sehari, tapi tanaman ini terus-menerus menghasilkan bunga baru. Bukan tentang durasi satu momen, tapi kontinuitas."
+            en: "Its flowers often arrive briefly, then give way to new buds. Moss rose keeps its color through rhythm: opening, resting, and returning with the sun.",
+            id: "Bunganya sering mekar sebentar, lalu memberi ruang bagi kuncup baru. Moss rose menjaga warnanya lewat ritme: merekah, beristirahat, lalu kembali bersama matahari."
         },
         tags: ["flower", "succulent", "light_sensitive"],
         habitat: "sunny_patch",
@@ -174,12 +174,12 @@ const speciesDatabase = [
         rarity: "epic",
         image: "assets/Mimosapudica.png",
         fact: {
-            en: "Even though it's not an animal, it can transmit electrical signals between cells. It's like a minimalist version of a nervous system... just enough to say, 'Hey, there's a disturbance!'",
-            id: "Walau bukan hewan, dia bisa menghantarkan sinyal listrik antar sel. Mirip sistem saraf versi minimalis... cukup untuk bilang, 'Hei, ada gangguan!'"
+            en: "Mimosa pudica folds its leaflets through electrical signals and rapid changes in turgor pressure inside the pulvinus, the small motor-like swelling at the base of its leaves.",
+            id: "Mimosa pudica menutup anak daunnya melalui sinyal listrik dan perubahan cepat tekanan turgor di dalam pulvinus, bantalan kecil seperti pusat gerak di pangkal daunnya."
         },
         unlockQuote: {
-            en: "Folding and unfolding its leaves takes energy, so it won't react constantly without reason. Its common name is literally 'touch-me-not'—a perfect reminder that it's okay to set clear boundaries to protect your energy.",
-            id: "Menutup dan membuka daun itu butuh energi. dia tidak akan terus-menerus bereaksi tanpa alasan. Jadi meskipun nama lokalnya putri malu, dia tidak malu untuk membuat batasan."
+            en: "Every fold has a cost. After repeated harmless touch, the plant may respond less, saving its motion for signals that matter.",
+            id: "Setiap lipatan punya biaya. Setelah sentuhan berulang yang tidak berbahaya, tanaman ini bisa mengurangi responsnya, seolah menyimpan gerak untuk sinyal yang lebih berarti."
         },
         tags: ["plant", "sensitive", "botany"],
         habitat: "wild_grass",
@@ -200,12 +200,12 @@ const speciesDatabase = [
         rarity: "legendary",
         image: "assets/Milnesiumtardigradum.png",
         fact: {
-            en: "It’s only about 0.3 to 0.5 mm long. Yet, it can be found almost anywhere: from damp moss patches to the freezing ice of Antarctica.",
-            id: "Panjangnya cuma sekitar 0,3–0,5 mm. Tapi dia bisa ditemukan hampir di mana saja: dari lumut lembap sampai es Antartika."
+            en: "Milnesium tardigradum is a tiny tardigrade, usually less than 1 mm long. It is often found in moist mosses and lichens, but its range extends across many regions of the world, including Antarctica.",
+            id: "Milnesium tardigradum adalah tardigrade kecil, biasanya kurang dari 1 mm. Ia sering ditemukan di lumut dan lichen yang lembap, tetapi sebarannya menjangkau banyak wilayah dunia, termasuk Antarktika."
         },
         unlockQuote: {
-            en: "Despite its incredible resilience, it still has its limits. Extreme conditions that last too long or are too intense can still be fatal. So, even with extreme tolerance, it remains an organism, just like us.",
-            id: "Walaupun luar biasa tangguh, dia tetap punya batas. Kondisi ekstrem yang terlalu lama atau terlalu intens tetap bisa membunuhnya. Jadi meskipun punya toleransi ekstrem dia tetap organisme seperti kita."
+            en: "When conditions turn harsh, it enters cryptobiosis and carries life as a pause, waiting for water, warmth, and time to return.",
+            id: "Saat kondisi menjadi sulit, ia memasuki kriptobiosis dan membawa hidup sebagai jeda, menunggu air, hangat, dan waktu kembali."
         },
         tags: ["microorganism", "extremophile", "legendary"],
         habitat: "water_drop",
@@ -228,12 +228,12 @@ const speciesDatabase = [
         rarity: "legendary",
         image: "assets/Troideshelena.png",
         fact: {
-            en: "Its wingspan can reach around 15–18 cm. When in flight, it feels less like a mere butterfly... and more like a small bird.",
-            id: "Rentang sayapnya bisa mencapai sekitar 15-18 cm. Saat terbang, kesannya bukan sekadar kupu-kupu... lebih seperti burung kecil."
+            en: "Troides helena is a large birdwing butterfly with a wingspan that can reach about 15 cm. Its dark forewings and golden-yellow hindwings give it a striking presence in forest edges, gardens, and lowland to montane habitats.",
+            id: "Troides helena adalah kupu-kupu sayap burung berukuran besar dengan rentang sayap yang dapat mencapai sekitar 15 cm. Sayap depannya gelap, sementara sayap belakangnya kuning keemasan, membuatnya mencolok di tepi hutan, kebun, hingga habitat dataran rendah dan pegunungan."
         },
         unlockQuote: {
-            en: "Commonly found in Indonesia, especially in forests that are still well-preserved. Yet... they are increasingly threatened by the loss of their habitat.",
-            id: "Banyak ditemukan di Indonesia, termasuk di hutan-hutan yang masih cukup terjaga. Tapi... mereka mulai terancam karena hilangnya habitat."
+            en: "Large wings still depend on small details: host plants, living forests, and safe passages between one patch of habitat and another.",
+            id: "Sayap besar tetap bergantung pada detail kecil: tanaman inang, hutan yang hidup, dan jalur aman dari satu petak habitat ke petak lainnya."
         },
         tags: ["butterfly", "pollinator", "endangered", "legendary", "flying"],
         habitat: "forest_canopy",
@@ -256,12 +256,12 @@ const speciesDatabase = [
         rarity: "legendary",
         image: "assets/Carcharodoncarcharias.png",
         fact: {
-            en: "Great white sharks have multiple rows of teeth, and if one falls out, it's immediately replaced by a new one. Throughout their lives, they can lose thousands of teeth... like a natural conveyor belt.",
-            id: "Hiu putih besar punya beberapa baris gigi, dan kalau satu copot, langsung digantikan oleh yang baru. Sepanjang hidupnya, dia bisa kehilangan ribuan gigi… seperti conveyor belt alami."
+            en: "Great white sharks have broad, serrated teeth arranged in several rows. As front teeth are lost, teeth from behind can move forward, keeping the jaw armed throughout life.",
+            id: "Hiu putih besar memiliki gigi lebar bergerigi yang tersusun dalam beberapa baris. Saat gigi depan lepas, gigi dari belakang dapat maju menggantikannya, menjaga rahangnya tetap siap sepanjang hidup."
         },
         unlockQuote: {
-            en: "They take a long time to mature and produce very few offspring. This makes their population highly vulnerable to overfishing.",
-            id: "Butuh waktu lama untuk dewasa, dan jumlah anaknya tidak banyak. Ini membuat populasinya rentan terhadap penangkapan berlebih."
+            en: "An apex predator can shape the ocean and still grow slowly, mature late, and leave only a small margin for recovery.",
+            id: "Sebagai predator puncak, ia mampu membentuk wajah samudra. Namun, laju tumbuhnya lambat, masa kedewasaannya lama, dan populasi mereka sangat rapuh untuk bisa pulih kembali."
         },
         tags: ["predator", "solitary", "marine", "apex"],
         habitat: "open_ocean",
