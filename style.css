@@ -194,6 +194,23 @@ h3 {
     line-height: 1.7;
 }
 
+.notification-status {
+    margin: 10px auto 0;
+    max-width: 28rem;
+    min-height: 1.5em;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.notification-status.is-positive {
+    color: var(--leaf-dark);
+}
+
+.notification-status.is-calm {
+    color: rgba(67, 54, 58, 0.72);
+}
+
 button {
     border: 1px solid var(--line-strong);
     border-radius: 0;

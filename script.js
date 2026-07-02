@@ -21,6 +21,7 @@ const pauseBtn = document.getElementById("pause-btn");
 const timeOptions = document.getElementById("time-options");
 const popup = document.getElementById("popup");
 const closePopupBtn = document.getElementById("close-popup");
+const notificationStatusUI = document.getElementById("notification-status");
 const sessionCountUI = document.getElementById("session-count");
 const speciesCountUI = document.getElementById("species-count");
 const latestDiscoveryUI = document.getElementById("latest-discovery");
@@ -62,9 +63,51 @@ let speciesCount = 0;
 let currentReward = null;
 let gardenCollection = [];
 let selectedArchiveEntryNumber = null;
+let notificationStatusKey = null;
+let notificationStatusTone = "calm";
 
 function notificationsSupported() {
     return "Notification" in window;
+}
+
+function getNotificationPermissionState() {
+    if (!notificationsSupported()) return "unsupported";
+    return Notification.permission;
+}
+
+function setNotificationStatus(messageKey = null, tone = "calm") {
+    notificationStatusKey = messageKey;
+    notificationStatusTone = tone;
+
+    notificationStatusUI.textContent = messageKey ? t(messageKey) : "";
+    notificationStatusUI.classList.toggle("is-positive", tone === "positive");
+    notificationStatusUI.classList.toggle("is-calm", tone !== "positive");
+}
+
+function refreshNotificationStatus() {
+    if (notificationStatusKey) {
+        setNotificationStatus(notificationStatusKey, notificationStatusTone);
+        return;
+    }
+
+    const permissionState = getNotificationPermissionState();
+
+    if (permissionState === "granted") {
+        setNotificationStatus("notificationStatusGranted", "positive");
+        return;
+    }
+
+    if (permissionState === "denied") {
+        setNotificationStatus("notificationStatusDenied");
+        return;
+    }
+
+    if (permissionState === "unsupported") {
+        setNotificationStatus("notificationStatusUnavailable");
+        return;
+    }
+
+    setNotificationStatus("notificationStatusDefault");
 }
 
 function t(key) {
@@ -363,17 +406,35 @@ function saveData() {
 }
 
 function requestNotificationPermissionIfNeeded() {
-    if (!notificationsSupported()) return;
-    if (Notification.permission !== "default") return;
+    if (!notificationsSupported()) {
+        setNotificationStatus("notificationStatusUnavailable");
+        return;
+    }
 
-    Notification.requestPermission().catch(() => {
-        // Ignore permission request failures and keep the in-app popup as fallback.
-    });
+    if (Notification.permission !== "default") {
+        refreshNotificationStatus();
+        return;
+    }
+
+    Notification.requestPermission()
+        .then((permission) => {
+            if (permission === "granted") {
+                setNotificationStatus("notificationStatusGranted", "positive");
+            } else if (permission === "denied") {
+                setNotificationStatus("notificationStatusDenied");
+            } else {
+                setNotificationStatus("notificationStatusDefault");
+            }
+        })
+        .catch(() => {
+            setNotificationStatus("notificationStatusError");
+        });
 }
 
 function showRewardNotification(reward) {
-    if (!notificationsSupported()) return;
-    if (Notification.permission !== "granted") return;
+    if (!notificationsSupported()) return false;
+    if (Notification.permission !== "granted") return false;
+    if (!document.hidden && document.hasFocus()) return false;
 
     const rewardName = getSpeciesName(reward);
     const bodyLines = [
@@ -393,6 +454,9 @@ function showRewardNotification(reward) {
         window.focus();
         notification.close();
     };
+
+    setNotificationStatus("notificationStatusGranted", "positive");
+    return true;
 }
 
 function completeSession() {
@@ -404,7 +468,13 @@ function completeSession() {
     popupTitleUI.textContent = t("sessionComplete");
     popupTextUI.innerHTML = getRewardMarkup(reward);
 
-    showRewardNotification(reward);
+    const notificationShown = showRewardNotification(reward);
+    if (!notificationShown) {
+        const permissionState = getNotificationPermissionState();
+        if (permissionState !== "granted") {
+            setNotificationStatus("notificationStatusFallback");
+        }
+    }
     popup.classList.remove("hidden");
     resetTimer();
 }
@@ -502,6 +572,7 @@ function renderUI() {
     langIdBtn.textContent = t("languageIndonesian");
 
     syncLanguageToggle();
+    refreshNotificationStatus();
     renderTimeOptions();
     updateButtons();
 
@@ -556,18 +627,19 @@ function startInterval() {
 function startTimer() {
     if (isRunning) return;
 
-    requestNotificationPermissionIfNeeded();
-
     hasStarted = true;
     isRunning = true;
     timeLeft = getSelectedTimeInSeconds();
     timerEndsAt = Date.now() + (timeLeft * 1000);
     timeOptions.disabled = true;
+    notificationStatusKey = null;
 
     updateButtons();
     updateDisplay();
+    refreshNotificationStatus();
     saveData();
     startInterval();
+    requestNotificationPermissionIfNeeded();
 }
 
 function pauseTimer() {
@@ -673,6 +745,9 @@ closePopupBtn.addEventListener("click", () => {
         plantToGarden(currentReward);
         currentReward = null;
     }
+
+    notificationStatusKey = null;
+    refreshNotificationStatus();
 });
 
 langEnBtn.addEventListener("click", () => setLanguage("en"));

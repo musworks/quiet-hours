@@ -1,5 +1,5 @@
 ﻿// ==========================================
-// DATABASE SPESIES (QUIET HOURS)
+// SPECIES DATABASE
 // ==========================================
 // Arsitektur:
 // - Database memakai key internal berbahasa Inggris

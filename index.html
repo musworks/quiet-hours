@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MuS: Quiet Hours</title>
+    <title>MuS: Mustimere</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alice&display=swap" rel="stylesheet">
@@ -15,15 +15,15 @@
     <main class="journal-layout">
     <section class="timer-box" aria-labelledby="app-name">
         <div class="card-topbar">
-            <p id="tagline" class="app-tagline">An instrument for keeping the rhythm of attention.</p>
+            <p id="tagline" class="app-tagline">A focus archive of species, traces, and study time.</p>
             <div class="language-toggle" aria-label="Language switcher">
                 <button type="button" id="lang-en" class="lang-link is-active">EN</button>
                 <span class="lang-divider">|</span>
                 <button type="button" id="lang-id" class="lang-link">ID</button>
             </div>
         </div>
-        <h1 id="app-name">Quiet Hours</h1>
-        <p id="supporting-line" class="supporting-line">Finish a session to unlock a species, a biology fact, and a reflective quote.</p>
+        <h1 id="app-name">Mustimere</h1>
+        <p id="supporting-line" class="supporting-line">Complete a study session to unlock a species, a biological trace, and a reflective note.</p>
 
         <div class="time-settings">
             <label for="time-options" id="time-options-label">Choose a duration:</label>
@@ -33,15 +33,16 @@
         <h2 id="time-display">25:00</h2>
 
         <div class="controls">
-            <button id="start-btn" class="btn-primary">Enter quiet</button>
+            <button id="start-btn" class="btn-primary">Begin study</button>
             <button id="pause-btn" class="btn-secondary hidden">Hold this moment</button>
         </div>
-        <p id="controls-microcopy" class="controls-microcopy">Choose a duration and see what the archive reveals when time runs out.</p>
+        <p id="controls-microcopy" class="controls-microcopy">Choose a duration and see what the archive reveals when time settles.</p>
+        <p id="notification-status" class="notification-status" aria-live="polite"></p>
     </section>
 
     <section class="garden-box" aria-labelledby="garden-title">
         <p id="welcome-back" class="garden-kicker">Welcome back to the archive.</p>
-        <h3 id="garden-title">Quiet Archive</h3>
+        <h3 id="garden-title">Trace Archive</h3>
 
         <div class="garden-stats">
             <span><span id="sessions-label">Entries Logged</span>: <b id="session-count">0</b></span>
