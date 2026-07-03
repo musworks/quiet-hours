@@ -69,6 +69,7 @@ const popupTitleUI = document.querySelector(".popup-content h2");
 const popupTextUI = document.querySelector(".popup-content p");
 const langEnBtn = document.getElementById("lang-en");
 const langIdBtn = document.getElementById("lang-id");
+const supportLinkUI = document.getElementById("support-link");
 
 let currentLanguage = "en";
 let timerInterval = null;
@@ -674,7 +675,7 @@ function showRewardNotification(reward) {
         body: bodyLines.join("\n"),
         icon: "favicon.png",
         badge: "favicon.png",
-        tag: "quiet-hours-reward"
+        tag: "mustimere-reward"
     });
 
     notification.onclick = () => {
@@ -798,6 +799,7 @@ function renderUI() {
     closePopupBtn.textContent = t("close");
     langEnBtn.textContent = t("languageEnglish");
     langIdBtn.textContent = t("languageIndonesian");
+    supportLinkUI.textContent = t("supportLink");
 
     syncLanguageToggle();
     refreshNotificationStatus();
