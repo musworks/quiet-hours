@@ -17,9 +17,9 @@
         <div class="card-topbar">
             <p id="tagline" class="app-tagline">A focus archive of species, traces, and study time.</p>
             <div class="language-toggle" aria-label="Language switcher">
-                <button type="button" id="lang-en" class="lang-link is-active">EN</button>
+                <button type="button" id="lang-en" class="lang-link is-active" aria-pressed="true" aria-label="English language">EN</button>
                 <span class="lang-divider">|</span>
-                <button type="button" id="lang-id" class="lang-link">ID</button>
+                <button type="button" id="lang-id" class="lang-link" aria-pressed="false" aria-label="Indonesian language">ID</button>
             </div>
         </div>
         <h1 id="app-name">Mustimere</h1>
@@ -85,10 +85,10 @@
     </section>
     </main>
 
-    <div id="popup" class="popup hidden">
-        <div class="popup-content">
-            <h2></h2>
-            <p></p>
+    <div id="popup" class="popup hidden" role="dialog" aria-modal="true" aria-labelledby="popup-title" aria-describedby="popup-body" aria-hidden="true">
+        <div class="popup-content" tabindex="-1">
+            <h2 id="popup-title"></h2>
+            <p id="popup-body"></p>
             <button id="close-popup">Keep this entry</button>
         </div>
     </div>

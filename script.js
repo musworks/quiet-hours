@@ -23,6 +23,14 @@ const RARITY_WEIGHTS = {
 const PITY_START_AFTER = 2;
 const PITY_HARD_LIMIT = 6;
 const PITY_STATE_VERSION = 1;
+const POPUP_FOCUSABLE_SELECTOR = [
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    "[tabindex]:not([tabindex='-1'])"
+].join(",");
 
 const timeDisplay = document.getElementById("time-display");
 const startBtn = document.getElementById("start-btn");
@@ -75,6 +83,7 @@ let gardenCollection = [];
 let selectedArchiveEntryNumber = null;
 let notificationStatusKey = null;
 let notificationStatusTone = "calm";
+let lastFocusedElementBeforePopup = null;
 let pityState = {
     version: PITY_STATE_VERSION,
     lowRarityStreak: 0,
@@ -321,6 +330,86 @@ function setSelectedTimeConfig(config = DEFAULT_TIME) {
 function syncLanguageToggle() {
     langEnBtn.classList.toggle("is-active", currentLanguage === "en");
     langIdBtn.classList.toggle("is-active", currentLanguage === "id");
+    langEnBtn.setAttribute("aria-pressed", String(currentLanguage === "en"));
+    langIdBtn.setAttribute("aria-pressed", String(currentLanguage === "id"));
+}
+
+function getPopupFocusableElements() {
+    return Array.from(popup.querySelectorAll(POPUP_FOCUSABLE_SELECTOR))
+        .filter((element) => element.offsetParent !== null || element === document.activeElement);
+}
+
+function openRewardPopup() {
+    const activeElement = document.activeElement;
+    lastFocusedElementBeforePopup = activeElement instanceof HTMLElement && !popup.contains(activeElement)
+        ? activeElement
+        : startBtn;
+
+    popup.classList.remove("hidden");
+    popup.setAttribute("aria-hidden", "false");
+
+    requestAnimationFrame(() => {
+        closePopupBtn.focus();
+    });
+}
+
+function returnFocusAfterPopupClose() {
+    const focusTarget = lastFocusedElementBeforePopup instanceof HTMLElement
+        && document.contains(lastFocusedElementBeforePopup)
+        ? lastFocusedElementBeforePopup
+        : startBtn;
+
+    focusTarget?.focus?.();
+    lastFocusedElementBeforePopup = null;
+}
+
+function closeRewardPopup() {
+    if (popup.classList.contains("hidden")) return;
+
+    popup.classList.add("hidden");
+    popup.setAttribute("aria-hidden", "true");
+
+    if (currentReward) {
+        plantToGarden(currentReward);
+        currentReward = null;
+    }
+
+    notificationStatusKey = null;
+    refreshNotificationStatus();
+    returnFocusAfterPopupClose();
+}
+
+function handlePopupKeydown(event) {
+    if (popup.classList.contains("hidden")) return;
+
+    if (event.key === "Escape") {
+        event.preventDefault();
+        closeRewardPopup();
+        return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusableElements = getPopupFocusableElements();
+    const firstElement = focusableElements[0] || popupContentUI;
+    const lastElement = focusableElements[focusableElements.length - 1] || popupContentUI;
+
+    if (!popup.contains(document.activeElement)) {
+        event.preventDefault();
+        firstElement.focus();
+        return;
+    }
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+        return;
+    }
+
+    if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+    }
 }
 
 function updateDisplay() {
@@ -614,8 +703,8 @@ function completeSession() {
             setNotificationStatus("notificationStatusFallback");
         }
     }
-    popup.classList.remove("hidden");
     resetTimer();
+    openRewardPopup();
 }
 
 function loadData() {
@@ -868,17 +957,8 @@ timeOptions.addEventListener("change", () => {
     saveData();
 });
 
-closePopupBtn.addEventListener("click", () => {
-    popup.classList.add("hidden");
-
-    if (currentReward) {
-        plantToGarden(currentReward);
-        currentReward = null;
-    }
-
-    notificationStatusKey = null;
-    refreshNotificationStatus();
-});
+closePopupBtn.addEventListener("click", closeRewardPopup);
+document.addEventListener("keydown", handlePopupKeydown);
 
 langEnBtn.addEventListener("click", () => setLanguage("en"));
 langIdBtn.addEventListener("click", () => setLanguage("id"));
