@@ -651,6 +651,13 @@ button:focus-visible,
     max-width: 420px;
     width: min(100%, 420px);
     box-shadow: 0 18px 40px var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+}
+
+.popup-content > * {
+    position: relative;
+    z-index: 1;
 }
 
 .popup-content h2 {
@@ -727,64 +734,88 @@ button:focus-visible,
     }
 }
 
-@keyframes effectFloating {
+@keyframes speciesFloat {
     0%,
     100% {
         transform: translateY(0);
     }
 
     50% {
-        transform: translateY(-8px);
+        transform: translateY(-4px);
     }
 }
 
-@keyframes effectGlowing {
+@keyframes archiveAura {
     0%,
     100% {
-        filter: none;
+        opacity: 0.45;
+        transform: scale(1);
     }
 
     50% {
-        filter: none;
+        opacity: 0.8;
+        transform: scale(1.03);
     }
 }
 
-@keyframes effectAuraPulse {
-    0% {
-        transform: scale(0.88);
-        opacity: 0.55;
-    }
-
-    70% {
-        transform: scale(1.45);
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(1.45);
-        opacity: 0;
-    }
-}
-
-@keyframes effectSparkling {
-    0% {
-        opacity: 0;
-        transform: scale(0) rotate(0deg);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1) rotate(180deg);
-    }
-
+@keyframes archiveShimmer {
+    0%,
     100% {
         opacity: 0;
-        transform: scale(0) rotate(360deg);
+    }
+
+    35%,
+    65% {
+        opacity: 0.32;
     }
 }
 
-.effect-glow {
-    animation: effectGlowing 2.5s ease-in-out infinite;
+.popup-content.effect-glow {
+    box-shadow:
+        0 0 0 1px rgba(var(--antique-bronze-rgb), 0.18),
+        0 18px 45px rgba(var(--antique-bronze-rgb), 0.14);
+}
+
+.effect-float {
+    animation: speciesFloat 5.5s ease-in-out infinite;
+}
+
+.popup-content.effect-aura::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        radial-gradient(circle at 50% 35%,
+            rgba(var(--dusty-rose-rgb), 0.16),
+            rgba(var(--antique-bronze-rgb), 0.08) 36%,
+            transparent 68%);
+    opacity: 0.7;
+    animation: archiveAura 7s ease-in-out infinite;
+}
+
+.popup-content.effect-sparkle::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        radial-gradient(circle, rgba(var(--antique-bronze-rgb), 0.24) 1px, transparent 1.5px),
+        radial-gradient(circle, rgba(var(--dusty-rose-rgb), 0.18) 1px, transparent 1.5px);
+    background-size: 72px 72px, 108px 108px;
+    background-position: 18px 22px, 44px 58px;
+    opacity: 0;
+    animation: archiveShimmer 4.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .effect-float,
+    .popup-content.effect-aura::before,
+    .popup-content.effect-sparkle::after {
+        animation: none;
+    }
 }
 
 @media (max-width: 768px) {

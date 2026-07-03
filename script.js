@@ -14,6 +14,15 @@ const TIME_PRESETS = [
 ];
 
 const DEFAULT_TIME = { value: 25, unit: "minutes" };
+const RARITY_WEIGHTS = {
+    common: 60,
+    rare: 25,
+    epic: 10,
+    legendary: 5
+};
+const PITY_START_AFTER = 2;
+const PITY_HARD_LIMIT = 6;
+const PITY_STATE_VERSION = 1;
 
 const timeDisplay = document.getElementById("time-display");
 const startBtn = document.getElementById("start-btn");
@@ -47,6 +56,7 @@ const gardenTitleUI = document.getElementById("garden-title");
 const sessionsLabelUI = document.getElementById("sessions-label");
 const speciesLabelUI = document.getElementById("species-label");
 const latestDiscoveryLabelUI = document.getElementById("latest-discovery-label");
+const popupContentUI = document.querySelector(".popup-content");
 const popupTitleUI = document.querySelector(".popup-content h2");
 const popupTextUI = document.querySelector(".popup-content p");
 const langEnBtn = document.getElementById("lang-en");
@@ -65,6 +75,11 @@ let gardenCollection = [];
 let selectedArchiveEntryNumber = null;
 let notificationStatusKey = null;
 let notificationStatusTone = "calm";
+let pityState = {
+    version: PITY_STATE_VERSION,
+    lowRarityStreak: 0,
+    lastRarity: null
+};
 
 function notificationsSupported() {
     return "Notification" in window;
@@ -158,6 +173,111 @@ function formatTimeOptionLabel(value, unit, label) {
     return `${value} ${unitLabel}`;
 }
 
+function safeParseStorage(key, fallback = null) {
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+    } catch (error) {
+        console.warn(`Invalid localStorage data for ${key}. Resetting...`, error);
+        localStorage.removeItem(key);
+        return fallback;
+    }
+}
+
+function getStoredData() {
+    return safeParseStorage(STORAGE_KEY, null) || safeParseStorage(LEGACY_STORAGE_KEY, null);
+}
+
+function isRareOrHigher(rarity) {
+    return rarity === "rare" || rarity === "epic" || rarity === "legendary";
+}
+
+function getTrailingLowRarityStreak(collection = []) {
+    let streak = 0;
+
+    for (let index = collection.length - 1; index >= 0; index--) {
+        const rarity = collection[index]?.rarity || "common";
+        if (isRareOrHigher(rarity)) break;
+
+        streak++;
+    }
+
+    return Math.min(streak, PITY_HARD_LIMIT);
+}
+
+function normalizePityState(rawState, collection = []) {
+    const latestArchivedRarity = collection.length
+        ? collection[collection.length - 1]?.rarity || null
+        : null;
+    const lastRarity = typeof rawState?.lastRarity === "string"
+        ? rawState.lastRarity
+        : latestArchivedRarity;
+    const inferredStreak = getTrailingLowRarityStreak(collection);
+    const savedStreak = Number.isInteger(rawState?.lowRarityStreak)
+        ? rawState.lowRarityStreak
+        : inferredStreak;
+    const lowRarityStreak = isRareOrHigher(lastRarity)
+        ? 0
+        : Math.min(Math.max(savedStreak, 0), PITY_HARD_LIMIT);
+
+    return {
+        version: PITY_STATE_VERSION,
+        lowRarityStreak,
+        lastRarity
+    };
+}
+
+function getPityAdjustedRarityWeights() {
+    const streak = Math.min(Math.max(pityState.lowRarityStreak || 0, 0), PITY_HARD_LIMIT);
+
+    if (streak >= PITY_HARD_LIMIT) {
+        return {
+            common: 0,
+            rare: 70,
+            epic: 20,
+            legendary: 10
+        };
+    }
+
+    if (streak < PITY_START_AFTER) {
+        return { ...RARITY_WEIGHTS };
+    }
+
+    const pitySteps = streak - PITY_START_AFTER + 1;
+
+    return {
+        common: Math.max(0, RARITY_WEIGHTS.common - (pitySteps * 10)),
+        rare: RARITY_WEIGHTS.rare + (pitySteps * 7),
+        epic: RARITY_WEIGHTS.epic + (pitySteps * 2),
+        legendary: RARITY_WEIGHTS.legendary + pitySteps
+    };
+}
+
+function selectRarityFromWeights(weights) {
+    const entries = Object.entries(weights).filter(([, weight]) => weight > 0);
+    const totalWeight = entries.reduce((total, [, weight]) => total + weight, 0);
+    let roll = Math.random() * totalWeight;
+
+    for (const [rarity, weight] of entries) {
+        roll -= weight;
+        if (roll < 0) return rarity;
+    }
+
+    return entries[entries.length - 1]?.[0] || "common";
+}
+
+function updatePityStateForReward(reward) {
+    const rarity = reward?.rarity || "common";
+
+    pityState = {
+        version: PITY_STATE_VERSION,
+        lowRarityStreak: isRareOrHigher(rarity)
+            ? 0
+            : Math.min((pityState.lowRarityStreak || 0) + 1, PITY_HARD_LIMIT),
+        lastRarity: rarity
+    };
+}
+
 function renderTimeOptions() {
     const previousSelection = timeOptions.options.length
         ? getSelectedTimeConfig()
@@ -179,15 +299,7 @@ function renderTimeOptions() {
 }
 
 function getSavedTimerState() {
-    const savedData = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
-    if (!savedData) return null;
-
-    try {
-        const parsedData = JSON.parse(savedData);
-        return parsedData?.timerState || null;
-    } catch {
-        return null;
-    }
+    return getStoredData()?.timerState || null;
 }
 
 function getSelectedTimeInSeconds() {
@@ -260,14 +372,39 @@ function createSpeciesVisual(species, className = "") {
     return image;
 }
 
-function applySpeciesEffects(targetElement, visualElement, species) {
-    if (!species.effects) return;
+function applySpeciesEffects(species) {
+    const rewardImage = popupContentUI?.querySelector(".popup-reward-art");
+    const effectClasses = [
+        "effect-glow",
+        "effect-aura",
+        "effect-sparkle",
+        "rarity-common",
+        "rarity-minor",
+        "rarity-rare",
+        "rarity-noted",
+        "rarity-epic",
+        "rarity-marked",
+        "rarity-legendary",
+        "rarity-singular"
+    ];
 
-    if (species.effects.float) targetElement.classList.add("effect-float");
-    if (species.effects.aura) targetElement.classList.add("effect-aura");
-    if (species.effects.sparkle) targetElement.classList.add("effect-sparkle");
-    if (species.effects.gardenClass) targetElement.classList.add(species.effects.gardenClass);
-    if (species.effects.glow) visualElement.classList.add("effect-glow");
+    if (!popupContentUI || !species) return;
+
+    popupContentUI.classList.remove(...effectClasses);
+    rewardImage?.classList.remove("effect-float");
+
+    const rarity = species.rarity || "common";
+    popupContentUI.classList.add(`rarity-${rarity}`);
+
+    if (rarity === "rare" || rarity === "noted" || rarity === "epic" || rarity === "marked") {
+        popupContentUI.classList.add("effect-glow");
+        rewardImage?.classList.add("effect-float");
+    }
+
+    if (rarity === "legendary" || rarity === "singular") {
+        popupContentUI.classList.add("effect-glow", "effect-aura", "effect-sparkle");
+        rewardImage?.classList.add("effect-float");
+    }
 }
 
 function updateLatestDiscovery(reward) {
@@ -393,6 +530,7 @@ function saveData() {
         speciesCount,
         gardenCollection,
         latestDiscovery,
+        pityState,
         timerState: {
             selectedTime,
             timeLeft,
@@ -467,6 +605,7 @@ function completeSession() {
 
     popupTitleUI.textContent = t("sessionComplete");
     popupTextUI.innerHTML = getRewardMarkup(reward);
+    applySpeciesEffects(reward);
 
     const notificationShown = showRewardNotification(reward);
     if (!notificationShown) {
@@ -480,12 +619,12 @@ function completeSession() {
 }
 
 function loadData() {
-    const savedData = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
-    if (!savedData) return;
+    const parsedData = getStoredData();
+    if (!parsedData) return;
 
-    const parsedData = JSON.parse(savedData);
     sessionCount = parsedData.sessionCount || 0;
     gardenCollection = parsedData.gardenCollection || [];
+    pityState = normalizePityState(parsedData.pityState, gardenCollection);
 
     const uniqueSpecies = new Set(gardenCollection.map((species) => species.id));
     speciesCount = uniqueSpecies.size;
@@ -584,6 +723,7 @@ function renderUI() {
     if (currentReward && !popup.classList.contains("hidden")) {
         popupTitleUI.textContent = t("sessionComplete");
         popupTextUI.innerHTML = getRewardMarkup(currentReward);
+        applySpeciesEffects(currentReward);
     }
 
     renderGarden();
@@ -681,18 +821,7 @@ function resetTimer() {
 }
 
 function pullGacha() {
-    const roll = Math.floor(Math.random() * 100) + 1;
-    let selectedRarity = "";
-
-    if (roll <= 60) {
-        selectedRarity = "common";
-    } else if (roll <= 85) {
-        selectedRarity = "rare";
-    } else if (roll <= 95) {
-        selectedRarity = "epic";
-    } else {
-        selectedRarity = "legendary";
-    }
+    const selectedRarity = selectRarityFromWeights(getPityAdjustedRarityWeights());
 
     const filteredSpecies = window.speciesDatabase.filter(
         (species) => species.rarity === selectedRarity
@@ -710,6 +839,7 @@ function plantToGarden(reward) {
     }
 
     gardenCollection.push(reward);
+    updatePityStateForReward(reward);
     selectedArchiveEntryNumber = sessionCount;
 
     sessionCountUI.textContent = sessionCount;
